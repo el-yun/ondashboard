@@ -1,17 +1,39 @@
+/*
+ * Gabia Dashboard
+ * http://www.gabia.com
+ *
+ * Inspired by John Resig's JavaScript Micro-Templating:
+ * http://ejohn.org/blog/javascript-micro-templating/
+ */
+
+
 var children = [
-	{num: 1, name: '테스트', comment: '처음'}, 
+	{num: 1, name: '테스트', comment: '처음'},
 	{num: 2, name: '테스트2', comment: '두번째'}
 ];
 
 var children2 =  [
-	{num: 3, name: '테스트3', comment: '세번째'}, 
+	{num: 3, name: '테스트3', comment: '세번째'},
 	{num: 4, name: '테스트4', comment: '네번째'}
 ];
+
+var data = {
+    "title": "JavaScript Templates",
+    "license": {
+        "name": "MIT license",
+        "url": "https://opensource.org/licenses/MIT"
+    },
+    "features": [
+        "lightweight & fast",
+        "powerful",
+        "zero dependencies"
+    ]
+};
 
 /*
 	Dashboard lib
 */
-(function(window){
+(function(){
 
 	// Table
 	var Table = function(_table){
@@ -44,60 +66,31 @@ var children2 =  [
 		document.getElementById(target).append(this._object);
 	}
 
+	var cache = {};
 	// Base
 	var Dashboard = {
-		__obj : null,
-		makeTable : function(id){
-			var table = new Table(document.createElement(id));
+			// Extend tmpl
+		 tmpl: function(str, data){
+		    var fn = !/\W/.test(str) ?
+		      cache[str] = cache[str] ||
+		        tmpl(document.getElementById(str).innerHTML) :
+		      new Function("obj",
+		        "var p=[],print=function(){p.push.apply(p,arguments);};" +
+		        "with(obj){p.push('" +
+		        str
+		          .replace(/[\r\t\n]/g, " ")
+		          .split("<%").join("\t")
+		          .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+		          .replace(/\t=(.*?)%>/g, "',$1,'")
+		          .split("\t").join("');")
+		          .split("%>").join("p.push('")
+		          .split("\r").join("\\'")
+		      + "');}return p.join('');");
 
-			for( var i = 0; i < children.length; i++ ) {
-			  var child = children[i];
-			  if(i === 0 ) {
-				table.addHeaders(Object.keys(child));
-			  }
-			  var row = table._object.insertRow();
-			  Object.keys(child).forEach(function(k) {
-				var cell = row.insertCell();
-				cell.appendChild(document.createTextNode(child[k]));
-			  })
+		    return data ? fn( data ) : fn;
 			}
-			  console.log(table);
-			return table;
-		}
 	}
-
 	// Export
 	window.Dashboard = Dashboard;
 
-})(window);
-
-
-	function ajax(url, method, data, async)
-	{
-		method = typeof method !== 'undefined' ? method : 'GET';
-		async = typeof async !== 'undefined' ? async : false;
-
-		if (window.XMLHttpRequest) {
-			var xhReq = new XMLHttpRequest();
-		}
-		else {
-			var xhReq = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-
-
-		if (method == 'POST'){
-			xhReq.open(method, url, async);
-			xhReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xhReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-			xhReq.send(data);
-		}
-		else
-		{
-			if(typeof data !== 'undefined' && data !== null) {
-				url = url+'?'+data;
-			}
-			xhReq.open(method, url, async);
-			xhReq.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-			xhReq.send(null);
-		}
-	}
+})();

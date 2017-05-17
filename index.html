@@ -6,7 +6,8 @@
   <meta name="Author" content="">
   <meta name="Keywords" content="">
   <meta name="Description" content="">
-<script type="text/javascript" src="dashboard.js"></script>
+  <script type="text/javascript" src="tmpl.min.js"></script>
+  <script type="text/javascript" src="dashboard.js"></script>
 
   <title>DashBoard</title>
  </head>
@@ -15,9 +16,24 @@
 
 	</div>
   <script>
-	var d = Dashboard.makeTable('table');
-	d.addObject(children2).render('tarea');
 	//d.render('tarea');
   </script>
+<script type="text/html" id="item_tmpl">
+  <h3>{%=o.title%}</h3>
+  <p>Released under the
+  <a href="{%=o.license.url%}">{%=o.license.name%}</a>.</p>
+  <h4>Features</h4>
+  <ul>
+  {% for (var i=0; i<o.features.length; i++) { %}
+      <li>{%=o.features[i]%}</li>
+  {% } %}
+  </ul>
+  </script>
+  <script>
+      var v = Dashboard.tmpl("item_tmpl", data);
+      console.log(v);
+  </script>
+
+
  </body>
 </html>
